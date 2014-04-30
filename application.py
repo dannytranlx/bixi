@@ -1,7 +1,7 @@
-from flask import Flask
-from flask import render_template
-import urllib2
+from flask import Flask, render_template, Response
+import json
 import re
+import urllib2
 
 app = Flask(__name__)
 
@@ -12,10 +12,11 @@ def index():
 @app.route("/api")
 def api():
 	data = fetch_data()
-	return ','.join(data)
+	return Response(json.dumps(data),  mimetype='application/json')
 
 def fetch_data():
 	url_bixi = "http://montreal.bixi.com/maps/statajax"
+	stations = []
 
 	try:
 		webparser = urllib2.urlopen(url_bixi).read()
@@ -24,10 +25,23 @@ def fetch_data():
 
 	if webparser:
 		data = re.findall("var station\s=\s\\{(.*?)\\}", webparser)
-		
+		for station in data:
+			station_obj = {}
 
-	if data:
-		return data
+			attributes = station.split(',')
+			for attribute in attributes:
+				attr = attribute.split(':')
+
+				attr_name = attr[0].strip()
+				attr_value = attr[1]
+
+				station_obj[attr_name] = attr_value
+
+			print station_obj
+			stations.append(station_obj)
+
+	if stations:
+		return stations
 
 	return "No station found"
 
