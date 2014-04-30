@@ -35,7 +35,8 @@ def fetch_data():
 				attr_name = attr[0].strip()
 				attr_value = attr[1]
 
-				station_obj[attr_name] = attr_value
+				if attr_name in 'id name lat long nbBikes nbEmptyDocks installed locked temporary':
+					station_obj[attr_name] = attr_value
 
 			print station_obj
 			stations.append(station_obj)
