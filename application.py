@@ -9,7 +9,7 @@ app = Flask(__name__)
 def index():
 	return render_template("index.html")
 
-@app.route("/api")
+@app.route("/stations")
 def api():
 	data = fetch_data()
 	return Response(json.dumps(data, sort_keys=True, indent=True),  mimetype='application/json')
