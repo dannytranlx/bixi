@@ -12,7 +12,7 @@ def index():
 @app.route("/api")
 def api():
 	data = fetch_data()
-	return Response(json.dumps(data),  mimetype='application/json')
+	return Response(json.dumps(data, sort_keys=True, indent=True),  mimetype='application/json')
 
 def fetch_data():
 	url_bixi = "http://montreal.bixi.com/maps/statajax"
