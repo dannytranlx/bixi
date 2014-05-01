@@ -24,7 +24,7 @@ def fetch_data():
 		return "Error: Cannot read the feed"
 
 	if webparser:
-		data = re.findall("var station\s=\s\\{(.*?)\\}", webparser)
+		data = re.findall('var station\s=\s\\{(.*?)\\}', webparser)
 		for station in data:
 			station_obj = {}
 
@@ -33,18 +33,29 @@ def fetch_data():
 				attr = attribute.split(':')
 
 				attr_name = attr[0].strip()
-				attr_value = attr[1]
+				attr_value = attr[1].strip('"')
 
-				if attr_name in 'id name lat long nbBikes nbEmptyDocks installed locked temporary':
-					station_obj[attr_name] = attr_value
+				if attr_name in ('id', 'name', 'lat', 'long', 'nbBikes', 'nbEmptyDocks', 'installed', 'locked', 'temporary'):
+					station_obj[attr_name] = clean(attr_value)
 
-			print station_obj
 			stations.append(station_obj)
 
 	if stations:
 		return stations
 
 	return "No station found"
+
+def clean(value):
+	if re.match(r'^-?\d+\.\d+$', value):
+		return float(value)
+	elif re.match(r'^\d+$', value):
+		return int(value)
+	elif 'true' in value:
+		return True
+	elif 'false' in value:
+		return False
+
+	return value
 
 if __name__ == "__main__":
 	app.debug = True
