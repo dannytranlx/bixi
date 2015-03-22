@@ -2,14 +2,23 @@ from flask import Flask, render_template, Response
 import json
 import re
 import urllib2
+from flask.ext.cache import Cache
+import redis
+import os
 
 app = Flask(__name__)
+
+app.config['CACHE_TYPE'] = 'redis'
+redis_url = os.getenv('REDISTOGO_URL', 'redis://127.0.0.1:6379')
+redis = redis.from_url(redis_url)
+app.cache = Cache(app)
 
 @app.route("/")
 def index():
 	return render_template("index.html")
 
 @app.route("/stations")
+@app.cache.cached(timeout=300, key_prefix="stations")
 def api():
 	data = fetch_data()
 	return Response(json.dumps(data, sort_keys=True, indent=True),  mimetype='application/json')
